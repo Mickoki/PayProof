@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PayProof — Solana Pay</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="mark">P</div>
+      <div><strong>PayProof</strong><div>Проверяемая оплата в тестовых сетях Solana</div></div>
+    </header>
+    <section id="create-view" class="card">
+      <h1>Создать счёт</h1>
+      <p class="hint">Выберите сеть кошелька. Devnet и Testnet используют разные тестовые монеты.</p>
+      <form id="pay-form">
+        <label>Адрес вашего кошелька Solana<input name="recipient" required placeholder="Публичный ключ кошелька"></label>
+        <label>Сеть<select name="network"><option value="devnet">Devnet</option><option value="testnet">Testnet</option></select></label>
+        <div class="row">
+          <label>Валюта и сумма
+            <div style="display:flex;gap:6px;margin-top:6px">
+              <select name="asset" style="width:100px"><option value="SOL">SOL</option><option value="USDC">USDC</option></select>
+              <input name="amount" type="number" step="any" required placeholder="0.01" style="margin:0">
+            </div>
+          </label>
+          <label>За что оплата<input name="description" required placeholder="Описание услуги или товара"></label>
+        </div>
+        <button type="submit">Создать счёт</button>
+        <p id="form-error" role="alert" style="color:#b42318"></p>
+      </form>
+    </section>
+    <section id="invoice-view" class="card hidden">
+      <h1 id="inv-desc"></h1>
+      <div class="amount"><span id="inv-amt"></span> <span id="inv-asset"></span></div>
+      <p id="inv-network-note" class="hint"></p>
+      <div id="inv-stat" class="status">Ожидает оплаты</div>
+      <p style="font-size:12px;font-weight:700;margin:16px 0 4px">Ссылка на страницу счёта:</p>
+      <input id="inv-page-link" readonly>
+      <button id="inv-copy" class="btn btn-sec" type="button">Скопировать ссылку на счёт</button>
+      <p id="inv-local-note" class="hint hidden">Сайт запущен локально: эта ссылка откроется только на данном компьютере. Для других устройств нужен опубликованный сайт.</p>
+      <div class="qr-container">
+        <p style="font-size:13px;color:#666;margin:0 0 10px">Откройте кошелёк в сети, указанной выше, и отсканируйте QR-код:</p>
+        <img id="inv-qr" alt="QR-код оплаты">
+      </div>
+      <p style="font-size:12px;font-weight:700;margin:12px 0 4px">Ссылка Solana Pay:</p>
+      <input id="inv-link" readonly>
+      <button id="inv-phantom" class="btn" type="button">Оплатить через Phantom в Chrome</button>
+      <p id="inv-wallet-msg" role="status" class="hint" style="text-align:center"></p>
+      <a id="inv-wallet" class="btn btn-sec" href="#">Открыть ссылку Solana Pay в другом кошельке</a>
+      <button id="inv-check" class="btn btn-sec" type="button">Проверить оплату</button>
+      <p id="inv-msg" style="font-size:13px;color:#555;text-align:center"></p>
+      <a id="inv-explorer" class="hidden" target="_blank" rel="noreferrer" style="display:block;text-align:center;margin-top:10px;color:#176737;font-weight:700">Открыть транзакцию в Explorer</a>
+      <div style="border-top:1px solid #e0e0e0;margin-top:20px;padding-top:14px;text-align:center"><a href="/">Создать ещё один счёт</a></div>
+    </section>
+  </main>
+</body>
+</html>

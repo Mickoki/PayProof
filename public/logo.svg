@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">PayProof</title>
+  <rect width="512" height="512" rx="112" fill="#152f25"/>
+  <path d="M145 112h155c75 0 119 42 119 107 0 68-47 111-119 111h-53v73H145V112zm102 82v54h47c17 0 26-10 26-27 0-18-9-27-26-27h-47z" fill="#c6f37a"/>
+  <circle cx="365" cy="376" r="68" fill="#f3f7f2"/>
+  <path d="m334 375 21 21 44-48" fill="none" stroke="#176737" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
