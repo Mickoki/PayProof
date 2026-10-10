@@ -1,0 +1,10 @@
+data/
+.env
+tests/devnet/node_modules/
+tests/devnet/test-keys.json
+tests/devnet/run-*/
+server.stdout.log
+server.stderr.log
+tmp/
+Requirements-deko.md
+HACKATHON_SUBMISSION.md
