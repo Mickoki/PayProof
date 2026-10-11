@@ -10,7 +10,7 @@ PayProof lets freelancers send a Solana invoice and show which on-chain transfer
 
 A seller enters a recipient wallet, network, asset, amount and description. PayProof creates a shareable invoice with a unique Solana Pay reference. A buyer pays the seller directly. The server compares the confirmed transaction's reference, recipient, asset and exact balance increase with the invoice, then shows the transaction signature and a printable payment record.
 
-Current evidence: a [fresh 0.001 SOL Testnet payment through Phantom](https://explorer.solana.com/tx/5Py8ceGwfPGi1bHGLFdmP7LNNuKQLxmP5dLgdZg8UMFDiaFbbUGX6M1jp2gZayGuew4P9huoe25aL2aYZRNEnSGm?cluster=testnet) was matched to its invoice on the current build on October 11, 2026. An independent RPC query found the invoice reference and the exact 1,000,000-lamport recipient balance increase. The user saved the browser payment record as PDF, and 18 automated tests pass. A hosted demo and a live USDC payment remain unverified. The app is a test-network prototype, not a production payment service.
+Current evidence: a [fresh 0.001 SOL Testnet payment through Phantom](https://explorer.solana.com/tx/5Py8ceGwfPGi1bHGLFdmP7LNNuKQLxmP5dLgdZg8UMFDiaFbbUGX6M1jp2gZayGuew4P9huoe25aL2aYZRNEnSGm?cluster=testnet) was matched to its invoice on the current build on October 11, 2026. An independent RPC query found the invoice reference and the exact 1,000,000-lamport recipient balance increase. The user saved the browser payment record as PDF, and 18 automated tests pass. The [public demo](https://payproof-demo.onrender.com/) supports invoice creation, sharing, QR display, and pending payment checks; a hosted wallet payment and a live USDC payment remain unverified. The app is a test-network prototype with ephemeral hosted invoice storage, not a production payment service.
 
 ## Founder and market details — complete with real evidence
 
@@ -22,7 +22,7 @@ Current evidence: a [fresh 0.001 SOL Testnet payment through Phantom](https://ex
 - Business model and expected buyer: [hypothesis, clearly labelled]
 - Competitor comparison: [specific workflow comparison with Helio, Request Finance and Coinbase Commerce, with sources]
 - Work completed during the hackathon and any pre-existing code: [accurate dates and disclosure]
-- Repository, hosted demo, pitch video and demo video: [verified URLs]
+- Repository: [Mickoki/PayProof](https://github.com/Mickoki/PayProof). Hosted demo: [payproof-demo.onrender.com](https://payproof-demo.onrender.com/). Pitch video and demo video: [verified URLs]
 
 ## Pitch video, 2–3 minutes
 
