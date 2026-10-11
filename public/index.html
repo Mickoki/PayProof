@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,24 +12,28 @@
   <main>
     <header>
       <div class="mark">P</div>
-      <div><strong>PayProof</strong><div>Проверяемая оплата в тестовых сетях Solana</div></div>
+      <div><strong>PayProof</strong><div>Verifiable payments on Solana test networks</div></div>
     </header>
     <section id="create-view" class="card">
-      <h1>Создать счёт</h1>
-      <p class="hint">Выберите сеть кошелька. Devnet и Testnet используют разные тестовые монеты.</p>
+      <h1>Create an invoice</h1>
+      <p class="hint">Choose the wallet network. Devnet and Testnet use different test coins.</p>
       <form id="pay-form">
-        <label>Адрес вашего кошелька Solana<input name="recipient" required placeholder="Публичный ключ кошелька"></label>
-        <label>Сеть<select name="network"><option value="devnet">Devnet</option><option value="testnet">Testnet</option></select></label>
+        <label>Your Solana wallet address<input name="recipient" required placeholder="Public wallet address"></label>
+        <label>Network<select name="network"><option value="devnet">Devnet</option><option value="testnet">Testnet</option></select></label>
+        <label>Optional USD amount to calculate SOL
+          <input id="f-usd" type="number" min="0" step="any" placeholder="For example, 10">
+        </label>
+        <p id="rate-hint" class="hint" role="status">Loading the SOL price… If unavailable, enter the SOL amount manually.</p>
         <div class="row">
-          <label>Валюта и сумма
+          <label>Asset and amount
             <div style="display:flex;gap:6px;margin-top:6px">
               <select name="asset" style="width:100px"><option value="SOL">SOL</option><option value="USDC">USDC</option></select>
               <input name="amount" type="number" step="any" required placeholder="0.01" style="margin:0">
             </div>
           </label>
-          <label>За что оплата<input name="description" required placeholder="Описание услуги или товара"></label>
+          <label>What is this payment for?<input name="description" required placeholder="Service or product description"></label>
         </div>
-        <button type="submit">Создать счёт</button>
+        <button type="submit">Create invoice</button>
         <p id="form-error" role="alert" style="color:#b42318"></p>
       </form>
     </section>
@@ -37,24 +41,36 @@
       <h1 id="inv-desc"></h1>
       <div class="amount"><span id="inv-amt"></span> <span id="inv-asset"></span></div>
       <p id="inv-network-note" class="hint"></p>
-      <div id="inv-stat" class="status">Ожидает оплаты</div>
-      <p style="font-size:12px;font-weight:700;margin:16px 0 4px">Ссылка на страницу счёта:</p>
-      <input id="inv-page-link" readonly>
-      <button id="inv-copy" class="btn btn-sec" type="button">Скопировать ссылку на счёт</button>
-      <p id="inv-local-note" class="hint hidden">Сайт запущен локально: эта ссылка откроется только на данном компьютере. Для других устройств нужен опубликованный сайт.</p>
-      <div class="qr-container">
-        <p style="font-size:13px;color:#666;margin:0 0 10px">Откройте кошелёк в сети, указанной выше, и отсканируйте QR-код:</p>
-        <img id="inv-qr" alt="QR-код оплаты">
+      <div id="inv-stat" class="status">Awaiting payment</div>
+      <div id="inv-receipt" class="receipt hidden">
+        <h2>Payment record</h2>
+        <p><strong>Network:</strong> <span id="receipt-network"></span></p>
+        <p><strong>Recipient:</strong> <span id="receipt-recipient"></span></p>
+        <p><strong>Reference:</strong> <span id="receipt-reference"></span></p>
+        <p><strong>Transaction:</strong> <span id="receipt-signature"></span></p>
+        <p><strong>Created:</strong> <span id="receipt-created"></span></p>
+        <p><strong>Paid:</strong> <span id="receipt-paid"></span></p>
+        <p class="hint">Status was checked against Solana RPC. Open the transaction in Explorer for independent verification.</p>
+        <button id="inv-print" class="btn btn-sec no-print" type="button">Print / save as PDF</button>
       </div>
-      <p style="font-size:12px;font-weight:700;margin:12px 0 4px">Ссылка Solana Pay:</p>
+      <p style="font-size:12px;font-weight:700;margin:16px 0 4px">Shareable invoice page:</p>
+      <input id="inv-page-link" readonly>
+      <button id="inv-copy" class="btn btn-sec" type="button">Copy invoice link</button>
+      <p id="inv-local-note" class="hint hidden">This site is running locally. The link works only on this computer until the app is publicly hosted.</p>
+      <div class="qr-container">
+        <p style="font-size:13px;color:#666;margin:0 0 10px">Set your wallet to the network above, then scan the QR code:</p>
+        <img id="inv-qr" alt="Solana Pay QR code">
+      </div>
+      <p style="font-size:12px;font-weight:700;margin:12px 0 4px">Solana Pay link:</p>
       <input id="inv-link" readonly>
-      <button id="inv-phantom" class="btn" type="button">Оплатить через Phantom в Chrome</button>
+      <button id="inv-phantom" class="btn" type="button">Pay with Phantom in Chrome</button>
       <p id="inv-wallet-msg" role="status" class="hint" style="text-align:center"></p>
-      <a id="inv-wallet" class="btn btn-sec" href="#">Открыть ссылку Solana Pay в другом кошельке</a>
-      <button id="inv-check" class="btn btn-sec" type="button">Проверить оплату</button>
+      <a id="inv-wallet" class="btn btn-sec" href="#">Open Solana Pay in another wallet</a>
+      <a id="inv-blink" class="btn btn-sec hidden" target="_blank" rel="noreferrer">Test Blink in Dialect (Devnet)</a>
+      <button id="inv-check" class="btn btn-sec" type="button">Check payment</button>
       <p id="inv-msg" style="font-size:13px;color:#555;text-align:center"></p>
-      <a id="inv-explorer" class="hidden" target="_blank" rel="noreferrer" style="display:block;text-align:center;margin-top:10px;color:#176737;font-weight:700">Открыть транзакцию в Explorer</a>
-      <div style="border-top:1px solid #e0e0e0;margin-top:20px;padding-top:14px;text-align:center"><a href="/">Создать ещё один счёт</a></div>
+      <a id="inv-explorer" class="hidden" target="_blank" rel="noreferrer" style="display:block;text-align:center;margin-top:10px;color:#176737;font-weight:700">Open transaction in Explorer</a>
+      <div style="border-top:1px solid #e0e0e0;margin-top:20px;padding-top:14px;text-align:center"><a href="/">Create another invoice</a></div>
     </section>
   </main>
 </body>

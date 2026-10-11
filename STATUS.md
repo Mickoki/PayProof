@@ -1,30 +1,24 @@
-# Состояние проекта
+# PayProof status — October 11, 2026
 
-## Сделано
+## Implemented
 
-- Форма создания счёта: адрес получателя, сумма, описание.
-- Уникальная страница счёта и ссылка Solana Pay для кошелька.
-- Страницу `/invoice/<id>` можно открыть напрямую после перезагрузки; открытие с другого устройства ещё не проверено.
-- Копирование ссылки на счёт, подсказка о локальном адресе и обозначение тестовой сети в интерфейсе.
-- Серверное хранение счёта и уникального `reference` для каждого платежа.
-- Проверка финализированной транзакции: `reference`, получатель, точный прирост баланса в минимальных единицах; для USDC также проверяется mint токена.
-- Защита от повторного зачёта одной транзакции.
-- Автоматическая проверка статуса открытого счёта каждые 12 секунд и ручная кнопка проверки.
-- 13 автоматических тестов прошли 10 октября 2026 года.
-- Добавлен выбор Devnet/Testnet для тестовых платежей SOL; Testnet USDC запрещён.
-- Добавлена кнопка оплаты SOL через расширение Phantom в Chrome. Пользователь подтвердил перевод `0.001 SOL` в Testnet; счёт стал `paid`, подпись и точная сумма сверены через RPC.
-- После ошибки Phantom «Reached end of buffer unexpectedly» подготовка исправлена на полный неподписанный пакет транзакции. Симуляция в Solana Testnet прошла без ошибки и без отправки средств.
-- Подготовлены черновик логотипа и текст заявки в `HACKATHON_SUBMISSION.md`; они ещё не отправлены.
-- Созданы два локальных одноразовых тестовых ключа для devnet-скрипта; секретный файл исключён из Git. На адресе покупателя пока 0 тестового SOL.
-- Живой тест в devnet: платёж 0.001 SOL принят, платёж 0.0005 SOL для счёта на 0.001 SOL отклонён. Ссылки на транзакции — в `DEVNET_TEST.md`.
+- Shareable Devnet and Testnet invoice pages, unique on-chain references and Phantom payment preparation for SOL.
+- Exact recipient balance increase checks for SOL and Devnet USDC in integer base units. Matching uses `confirmed` commitment and rejects a transaction signature already assigned to another invoice.
+- Printable payment record with invoice and transaction details. It is a browser print/PDF view, not a signed attestation.
+- Optional USD-to-SOL calculation from a recent CoinGecko quote. Failed price requests return an error; no fallback price is used.
+- In-memory creation and verification limits, a per-invoice RPC cooldown, and a Render Blueprint with a paid persistent disk.
+- Locally generated Solana Pay QR codes; experimental Devnet SOL Action endpoint and Dialect link.
+- `node --test`: 18 tests pass on the current code.
 
-## Ещё не сделано или не проверено
+## Verified outside mocks
 
-- Открытие Solana Pay ссылки или QR в другом кошельке и работа опубликованной версии.
-- Живой платёж USDC; USDC проверен только автоматическими тестами с подставной транзакцией.
-- После исправлений 10 октября ещё не повторён живой devnet тест; запись в `DEVNET_TEST.md` относится к предыдущей версии кода.
-- Запрос бесплатного devnet SOL на локальный адрес покупателя отклонён публичным RPC (ошибка и затем лимит 429). Установка зависимости для старого скрипта также остановилась на проверке supply-chain и отсутствии офлайн-метаданных; ручной тест через Phantom от этой зависимости не зависит.
-- Постоянный публичный хостинг. Сейчас приложение работает только при запущенном `node server.js`.
-- Постоянная база данных и надёжный RPC провайдер для размещённой версии. Сейчас используются локальный JSON файл и публичный RPC.
-- Вход продавца, разграничение доступа и аудит платёжной логики перед использованием с реальными клиентами.
-- GitHub репозиторий, публичное демо и видеоматериалы для заявки на хакатон.
+- On October 11, the current build matched a fresh Phantom payment of 0.001 Testnet SOL to invoice `ba1fc06c-2bc1-4ad6-ad34-50c7f69c1ceb` and displayed `paid`. An independent Testnet RPC query found the invoice reference and a 1,000,000-lamport increase at the recipient address. The browser payment record was saved as PDF. See [DEVNET_TEST.md](DEVNET_TEST.md) for the transaction.
+- An earlier Phantom Chrome payment of 0.001 Testnet SOL was matched on October 10.
+
+## Not complete or not verified
+
+- No hosted demo has been tested on another device. The October 11 live test used localhost.
+- No live USDC or mainnet payment has been performed. Mainnet creation is not exposed.
+- Seller authentication, invoice expiration, a production datastore and an independent payment-record signature are absent.
+- The hosted Blink and wallet signing flow have not been tested; X unfurling requires Dialect registration. Telegram Mini App is not integrated.
+- GitHub availability, hosting credentials, team details, user interviews and submission videos must be supplied or verified by the founders.

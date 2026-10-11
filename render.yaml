@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: payproof
+    runtime: node
+    plan: starter
+    buildCommand: "echo No build step"
+    startCommand: node server.js
+    healthCheckPath: /
+    disk:
+      name: invoice-data
+      mountPath: /opt/payproof-data
+      sizeGB: 1
+    envVars:
+      - key: PAYPROOF_DATA_DIR
+        value: /opt/payproof-data
+      - key: PAYPROOF_TRUST_PROXY
+        value: "1"
+      - key: PAYPROOF_RPC_URL
+        sync: false
+      - key: PAYPROOF_TESTNET_RPC_URL
+        sync: false

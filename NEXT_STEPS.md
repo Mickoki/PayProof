@@ -1,27 +1,9 @@
-# Следующие этапы PayProof
+# Next steps before the October 12, 2026 submission deadline
 
-Срок подачи в Crypto World's Fair: **12 октября 2026 года, 23:59 Pacific Time** (**13 октября, 11:59 по времени Кызылорды**). Источник: [официальные правила Colosseum](https://colosseum.com/legal/Crypto%20World's%20Fair%20Hackathon%20Rules.pdf).
+1. The fresh localhost Testnet SOL payment on the current build is complete; see [DEVNET_TEST.md](DEVNET_TEST.md). Test the Devnet Blink through Dialect separately if it will appear in the video.
+2. Publish the repository and deploy the demo with reliable Solana RPC endpoints and persistent invoice storage. The included Render Blueprint requires a paid plan for its disk. Verify the public URL on a phone and after a service restart; the October 11 payment did not cover hosting.
+3. Fill [SUBMISSION_DRAFT.md](SUBMISSION_DRAFT.md) with real team background, customer conversations, a precise initial market, competitor comparison and a specific distribution experiment. Disclose any work completed before the hackathon.
+4. Record the English 2–3 minute pitch and a separate product demo of at most three minutes. State clearly that the payments use valueless test coins and that live USDC and mainnet payments are unverified.
+5. Check all submission links and complete the team leader's Colosseum form before 11:59 p.m. Pacific Time on October 12.
 
-## 1. Доказать работу прототипа — выполнено 10 октября
-
-- Счёт `8ce2d54b-0d78-48fa-84f5-fdd72d42f7ab` оплачен через Phantom в Chrome тестовым SOL сети Testnet.
-- PayProof нашёл финализированную транзакцию, проверил `reference`, получателя и точную сумму, затем выставил `paid`.
-- [Транзакция в Explorer](https://explorer.solana.com/tx/64BQKDws3uQabDan3eDuCCxQXRBddtJEyDoQb33AgW5hz1GmYhhJA8dniR6eruENr7fWoxLcpRbK674BFPaes9S3?cluster=testnet); детали — в `DEVNET_TEST.md`. Автоматические тесты: 13 из 13.
-
-## 2. Подготовить заявку — текущий приоритет
-
-1. Оба участника регистрируются в Colosseum; лидер команды добавляет второго участника при подаче.
-2. Создать GitHub репозиторий и загрузить код. До публикации проверить, что `data/`, `tests/devnet/test-keys.json`, `.env`, логи и временные файлы не попали в репозиторий.
-3. Заполнить реальные сведения о команде, целевой аудитории, опыте, проблеме, первых пользователях и способе их привлечения. Черновик текста и сценариев — в `HACKATHON_SUBMISSION.md`.
-4. Записать презентацию на 2–3 минуты и отдельное техническое демо до 3 минут. В демо показать создание счёта, подключение Phantom, `paid` и ссылку на Testnet транзакцию. Не представлять тестовые монеты как реальные платежи.
-5. Подать заявку через кабинет Colosseum до срока. Проверить доступ судей к репозиторию и видео.
-
-**Готово, когда:** у команды есть заполненная заявка, доступный судьям код и оба видео.
-
-## 3. Опубликовать демо — по возможности до подачи
-
-Разместить Node приложение и постоянное хранилище счетов, подключить стабильный Solana RPC. Проверить ссылку на счёт с другого устройства и сохранность статуса после перезапуска. Сейчас `localhost` доступен только на этом компьютере; опубликованное демо пока отсутствует.
-
-## 4. Развивать после подачи
-
-Проверить живой USDC перевод и настройку основной сети на собственных кошельках, провести аудит платёжной логики и добавить управление доступом продавца. До этих проверок не принимать платежи клиентов.
+After submission: add seller authentication, invoice expiry, a production datastore and a live USDC test before considering real customer payments.

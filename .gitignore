@@ -8,3 +8,7 @@ server.stderr.log
 tmp/
 Requirements-deko.md
 HACKATHON_SUBMISSION.md
+*.zip
+.codex-finalizer/
+.deck-build/
+output/

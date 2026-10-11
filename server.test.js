@@ -9,6 +9,9 @@ import { encodeBase58, NETWORKS } from './lib.js';
 process.env.PAYPROOF_DATA_DIR = await mkdtemp(path.join(os.tmpdir(), 'payproof-test-'));
 process.env.PAYPROOF_NETWORK = 'devnet';
 process.env.PAYPROOF_ASSET = 'SOL';
+process.env.PAYPROOF_VERIFY_MIN_INTERVAL_MS = '0';
+process.env.PAYPROOF_VERIFY_PER_MIN = '0';
+process.env.PAYPROOF_CREATE_PER_HOUR = '0';
 const { handle } = await import('./server.js');
 
 async function request(method, url, body) {
@@ -17,14 +20,14 @@ async function request(method, url, body) {
   req.url = url;
   req.headers = { host: 'localhost:3000' };
   const result = { status: 0, data: null, headersSent: false,
-    writeHead(status) { this.status = status; this.headersSent = true; },
+    writeHead(status, headers) { this.status = status; this.headers = headers; this.headersSent = true; },
     end(content) { this.data = content ? JSON.parse(content) : null; }
   };
   await handle(req, result);
   return result;
 }
 
-test('create an invoice, then verify only the exact finalized transaction', async () => {
+test('create an invoice, then verify only the exact confirmed transaction', async () => {
   const recipient = encodeBase58(Buffer.alloc(32, 4));
   const created = await request('POST', '/api/invoices', { recipient, amount: '0.01', description: 'Логотип' });
   assert.equal(created.status, 201);
@@ -37,7 +40,8 @@ test('create an invoice, then verify only the exact finalized transaction', asyn
   let amountReceived = 9_000_000;
   let secondReference = null;
   globalThis.fetch = async (_url, options) => {
-    const { method } = JSON.parse(options.body);
+    const { method, params } = JSON.parse(options.body);
+    assert.equal(params.at(-1).commitment, 'confirmed');
     const result = method === 'getSignaturesForAddress'
       ? [{ signature: 'test-signature', err: null }]
       : { transaction: { message: { accountKeys: [reference, secondReference, recipient].filter(Boolean) } },
@@ -62,6 +66,80 @@ test('create an invoice, then verify only the exact finalized transaction', asyn
     assert.equal(replay.data.status, 'pending');
   } finally {
     globalThis.fetch = originalFetch;
+  }
+});
+
+test('Devnet SOL Action exposes metadata and a base64 unsigned transaction', async () => {
+  const recipient = encodeBase58(Buffer.alloc(32, 16));
+  const payer = encodeBase58(Buffer.alloc(32, 17));
+  const blockhash = encodeBase58(Buffer.alloc(32, 18));
+  const created = await request('POST', '/api/invoices', { recipient, amount: '0.001', network: 'devnet' });
+  const rules = await request('GET', '/actions.json');
+  assert.equal(rules.status, 200);
+  assert.equal(rules.headers['Access-Control-Allow-Origin'], '*');
+  const metadata = await request('GET', `/api/actions/pay/${created.data.id}`);
+  assert.equal(metadata.status, 200);
+  assert.equal(metadata.data.type, 'action');
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ jsonrpc: '2.0', id: 1,
+    result: { value: { blockhash } } }), { status: 200 });
+  try {
+    const posted = await request('POST', `/api/actions/pay/${created.data.id}`, { account: payer });
+    assert.equal(posted.status, 200);
+    assert.equal(Buffer.from(posted.data.transaction, 'base64').length, 248);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('invoice QR endpoint serves a local SVG', async () => {
+  const recipient = encodeBase58(Buffer.alloc(32, 19));
+  const created = await request('POST', '/api/invoices', { recipient, amount: '0.002' });
+  const req = Readable.from([]);
+  req.method = 'GET';
+  req.url = `/api/invoices/${created.data.id}/qr.svg`;
+  req.headers = { host: 'localhost:3000' };
+  const res = { status: 0, body: '',
+    writeHead(status, headers) { this.status = status; this.headers = headers; },
+    end(content) { this.body = String(content); } };
+  await handle(req, res);
+  assert.equal(res.status, 200);
+  assert.match(res.headers['Content-Type'], /image\/svg\+xml/);
+  assert.match(res.body, /^<svg /);
+});
+
+test('price endpoint reports an upstream failure without inventing a SOL price', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response('', { status: 429 });
+  try {
+    const response = await request('GET', '/api/price');
+    assert.equal(response.status, 503);
+    assert.equal(response.data.solana, undefined);
+    assert.match(response.data.error, /HTTP 429/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('repeated verification of one invoice does not repeat RPC immediately', async () => {
+  const recipient = encodeBase58(Buffer.alloc(32, 15));
+  const created = await request('POST', '/api/invoices', { recipient, amount: '0.001' });
+  const originalFetch = globalThis.fetch;
+  process.env.PAYPROOF_VERIFY_MIN_INTERVAL_MS = '10000';
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls++;
+    return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: [] }), { status: 200 });
+  };
+  try {
+    const first = await request('POST', `/api/invoices/${created.data.id}/verify`);
+    const second = await request('POST', `/api/invoices/${created.data.id}/verify`);
+    assert.equal(first.status, 200);
+    assert.equal(second.status, 200);
+    assert.equal(calls, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+    process.env.PAYPROOF_VERIFY_MIN_INTERVAL_MS = '0';
   }
 });
 

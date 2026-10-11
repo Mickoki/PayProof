@@ -36,6 +36,18 @@ export function assertAddress(value) {
 
 export function generateReference() { return encodeBase58(crypto.randomBytes(32)); }
 
+let cachedSolPrice = null;
+export async function getSolPrice() {
+  if (cachedSolPrice && Date.now() - cachedSolPrice.fetchedAt < 60_000) return cachedSolPrice;
+  const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd',
+    { signal: AbortSignal.timeout(5000) });
+  if (!response.ok) throw new Error(`Price service unavailable (HTTP ${response.status})`);
+  const usd = Number((await response.json())?.solana?.usd);
+  if (!Number.isFinite(usd) || usd <= 0) throw new Error('Price service returned an invalid SOL quote');
+  cachedSolPrice = { usd, fetchedAt: Date.now() };
+  return cachedSolPrice;
+}
+
 export function parseAmount(value, decimals) {
   const str = String(value);
   if (!/^(?:0|[1-9]\d*)(?:\.\d+)?$/.test(str)) throw new Error('Укажите положительную сумму');
@@ -187,7 +199,7 @@ export async function preparePhantomPayment(invoice, payer) {
   if (invoice.asset !== 'SOL') throw new Error('Оплата через Phantom в Chrome пока доступна только для SOL');
   assertAddress(payer);
   const network = invoice.network || 'devnet';
-  const result = await rpcCall(rpcFor(network), 'getLatestBlockhash', [{ commitment: 'finalized' }]);
+  const result = await rpcCall(rpcFor(network), 'getLatestBlockhash', [{ commitment: 'confirmed' }]);
   return { transaction: buildUnsignedSolTransaction(invoice, payer, result?.value?.blockhash), network };
 }
 
@@ -195,13 +207,13 @@ export async function verifyPaymentOnChain(invoice, isUsed = () => false) {
   if (invoice.status === 'paid') return { paid: true, signature: invoice.txSignature };
   const network = invoice.network || 'devnet';
   const rpc = rpcFor(network);
-  const signatures = await rpcCall(rpc, 'getSignaturesForAddress', [invoice.reference, { limit: 20, commitment: 'finalized' }]);
-  if (!signatures?.length) return { paid: false, reason: 'Платёж ещё не отправлен или ожидает подтверждения в блокчейне' };
+  const signatures = await rpcCall(rpc, 'getSignaturesForAddress', [invoice.reference, { limit: 20, commitment: 'confirmed' }]);
+  if (!signatures?.length) return { paid: false, reason: 'Payment has not been sent or confirmed yet' };
   for (const item of signatures) {
     if (item.err || isUsed(item.signature)) continue;
     const tx = await rpcCall(rpc, 'getTransaction', [item.signature,
-      { encoding: 'jsonParsed', commitment: 'finalized', maxSupportedTransactionVersion: 0 }]);
+      { encoding: 'jsonParsed', commitment: 'confirmed', maxSupportedTransactionVersion: 0 }]);
     if (transactionMatches(invoice, tx)) return { paid: true, signature: item.signature };
   }
-  return { paid: false, reason: 'Сумма, токен или получатель не совпадают' };
+  return { paid: false, reason: 'Amount, asset or recipient does not match this invoice' };
 }
