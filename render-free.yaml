@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: payproof-demo
+    runtime: node
+    plan: free
+    buildCommand: "echo No build step"
+    startCommand: node server.js
+    healthCheckPath: /
+    envVars:
+      - key: PAYPROOF_TRUST_PROXY
+        value: "1"
+      - key: PAYPROOF_RPC_URL
+        value: https://api.devnet.solana.com
+      - key: PAYPROOF_TESTNET_RPC_URL
+        value: https://api.testnet.solana.com
