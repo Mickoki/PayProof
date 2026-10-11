@@ -1,7 +1,7 @@
 # Next steps before the October 12, 2026 submission deadline
 
 1. The fresh localhost Testnet SOL payment on the current build is complete; see [DEVNET_TEST.md](DEVNET_TEST.md). Test the Devnet Blink through Dialect separately if it will appear in the video.
-2. The repository is published. Deploy the temporary free demo with [render-free.yaml](render-free.yaml), then verify the public URL on a phone. Its invoice data is intentionally ephemeral and the public RPC endpoints may rate-limit; create a fresh invoice shortly before recording. The paid [render.yaml](render.yaml) remains available for a persistent-disk deployment. The October 11 payment did not cover hosting.
+2. The repository is published. Deploy the temporary free demo with the default [render.yaml](render.yaml), then verify the public URL on a phone. Its invoice data is intentionally ephemeral and the public RPC endpoints may rate-limit; create a fresh invoice shortly before recording. The paid [render-paid.yaml](render-paid.yaml) remains available for a persistent-disk deployment. The October 11 payment did not cover hosting.
 3. Fill [SUBMISSION_DRAFT.md](SUBMISSION_DRAFT.md) with real team background, customer conversations, a precise initial market, competitor comparison and a specific distribution experiment. Disclose any work completed before the hackathon.
 4. Record the English 2–3 minute pitch and a separate product demo of at most three minutes. State clearly that the payments use valueless test coins and that live USDC and mainnet payments are unverified.
 5. Check all submission links and complete the team leader's Colosseum form before 11:59 p.m. Pacific Time on October 12.

@@ -6,7 +6,7 @@
 - Exact recipient balance increase checks for SOL and Devnet USDC in integer base units. Matching uses `confirmed` commitment and rejects a transaction signature already assigned to another invoice.
 - Printable payment record with invoice and transaction details. It is a browser print/PDF view, not a signed attestation.
 - Optional USD-to-SOL calculation from a recent CoinGecko quote. Failed price requests return an error; no fallback price is used.
-- In-memory creation and verification limits, a per-invoice RPC cooldown, and a Render Blueprint with a paid persistent disk.
+- In-memory creation and verification limits, a per-invoice RPC cooldown, a temporary free Render Blueprint, and an optional paid Blueprint with a persistent disk.
 - Locally generated Solana Pay QR codes; experimental Devnet SOL Action endpoint and Dialect link.
 - `node --test`: 18 tests pass on the current code.
 
